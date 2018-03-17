@@ -140,7 +140,12 @@ RCT_EXPORT_METHOD(animateToRegion:(nonnull NSNumber *)reactTag
         } else {
             [AIRMap animateWithDuration:duration/1000 animations:^{
                 [(AIRMap *)view setRegion:region animated:YES];
+            } completion:^(BOOL finished){
+              AIRMap *map = (AIRMap *)view;
+              id event = @{@"type:": @"region"};
+              map.onAnimationComplete(event);
             }];
+        }
         }
     }];
 }
@@ -160,6 +165,10 @@ RCT_EXPORT_METHOD(animateToCoordinate:(nonnull NSNumber *)reactTag
             region.center = latlng;
             [AIRMap animateWithDuration:duration/1000 animations:^{
                 [mapView setRegion:region animated:YES];
+            } completion:^(BOOL finished){
+              AIRMap *map = (AIRMap *)view;
+              id event = @{@"type:": @"coordinate"};
+              mapView .onAnimationComplete(event);
             }];
         }
     }];
@@ -181,6 +190,9 @@ RCT_EXPORT_METHOD(animateToViewingAngle:(nonnull NSNumber *)reactTag
 
           [AIRMap animateWithDuration:duration/1000 animations:^{
               [mapView setCamera:mapCamera animated:YES];
+          } completion:^(BOOL finished){
+            id event = @{@"type:": @"angle"};
+            mapView.onAnimationComplete(event);
           }];
       }
   }];
