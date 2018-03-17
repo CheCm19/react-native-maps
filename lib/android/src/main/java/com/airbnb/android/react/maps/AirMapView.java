@@ -607,7 +607,16 @@ public class AirMapView extends MapView implements GoogleMap.InfoWindowAdapter,
 
   public void animateToRegion(LatLngBounds bounds, int duration) {
     if (map == null) return;
-    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0), duration, null);
+    final AirMapView view = this; 
+    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0), duration, new GoogleMap.CancelableCallback() {
+      @Override
+      public void onFinish() {
+        view.onAnimationComplete();
+      }
+      @Override
+      public void onCancel() {
+      }
+    });
   }
 
   public void animateToViewingAngle(float angle, int duration) {
@@ -804,6 +813,12 @@ public class AirMapView extends MapView implements GoogleMap.InfoWindowAdapter,
     AirMapMarker markerView = getMarkerMap(marker);
     event = makeClickEventData(marker.getPosition());
     manager.pushEvent(context, markerView, "onDragEnd", event);
+  }
+
+  public void onAnimationComplete() {
+    WritableMap event = new WritableNativeMap();
+    event.putString("type", "region");
+    manager.pushEvent(context, this, "onAnimationComplete", event);
   }
 
   private ProgressBar getMapLoadingProgressBar() {
